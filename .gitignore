@@ -1,0 +1,59 @@
+# Global ignores
+.env
+.env.local
+.DS_Store
+*.log
+
+# Python / Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+*.eggs/
+*.bak
+*.swp
+*.coverage
+.coverage.*
+coverage/
+htmlcov/
+.cache/
+pip-wheel-metadata/
+
+# Migrations Django 
+**/migrations/
+
+# Virtual environments
+backend/venv/
+backend/.venv/
+
+# IDEs
+.idea/
+.vscode/
+
+# Django static/media files
+staticfiles/
+media/
+
+# Node / Next.js 
+frontend/node_modules/
+frontend/.next/
+frontend/.turbo/
+frontend/.eslintcache
+frontend/out/
+frontend/dist/
+frontend/build/
+
+# JS/TS stuff
+**/*.tsbuildinfo
+pnpm-lock.yaml
+yarn.lock
+
+# Notes
+**/notes.md
+

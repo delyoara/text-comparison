@@ -1,0 +1,55 @@
+# Environnement virtuel Python
+venv/
+.venv/
+**/__pycache__/
+**/*.py[cod]
+
+# Base de données locale Django
+**/db.sqlite3
+
+# Fichiers d'environnement
+.env
+.env.*
+
+# Fichiers de log
+*.log
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Fichiers perso / notes
+**/notes.md
+
+# Dossiers d'IDE
+.idea/
+.vscode/
+
+# Node.js / Next.js
+**/node_modules/
+**/.next/
+**/dist/
+
+# Build frontend
+**/out/
+**/.turbo/
+
+# Coverage / tests
+coverage/
+htmlcov/
+*.cover
+*.py,cover
+*.mocha
+
+# Typescript / JS
+**/*.tsbuildinfo
+
+# Autres fichiers inutiles
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# Fichiers perso
+**/notes.md
