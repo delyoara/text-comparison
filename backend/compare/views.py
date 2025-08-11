@@ -5,22 +5,25 @@ from compare.utils.chunking import chunk_article
 from compare.utils.embedding import encode_chunks
 
 
-def compare_texts_simple(request):
+def compare_texts(request):
     # Récupère les textes depuis l'URL si disponibles
     text1 = request.GET.get("text1", "")
-    text2 = request.GET.get("text2", "")
+    text2 = request.GET.get("text1_tradus", "")
+
+    print(f"Text1: {text1[:100]}...")
+    print(f"Text2: {text2[:100]}...")
 
     # Si les textes ne sont pas fournis, les lire depuis les fichiers
     if not text1:
         try:
-            with open(os.path.join("data", "text1.txt"), "r", encoding="mac_roman") as f:
+            with open(os.path.join("data", "text1.txt"), "r", encoding="UTF-8") as f:
                 text1 = f.read()
         except FileNotFoundError:
             return JsonResponse({"error": "Fichier text1.txt introuvable."}, status=400)
 
     if not text2:
         try:
-            with open(os.path.join("data", "text2.txt"), "r", encoding="mac_roman") as f:
+            with open(os.path.join("data", "text1_tradus.txt"), "r", encoding="UTF-8") as f:
                 text2 = f.read()
         except FileNotFoundError:
             return JsonResponse({"error": "Fichier text2.txt introuvable."}, status=400)

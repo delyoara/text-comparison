@@ -16,11 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from compare.views import compare_texts_simple 
+from compare.views import compare_texts
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("compare-simple/", compare_texts_simple)
+    path("compare/", compare_texts)
 ]
 
 
