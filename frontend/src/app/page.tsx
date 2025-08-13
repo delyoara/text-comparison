@@ -1,103 +1,147 @@
-import Image from "next/image";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+import Button from "./components/Button";
+import TextInput from "./components/TextInput";
+import TextSimilarity from "./components/TextSimilarity";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const router = useRouter();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+  const [text1, setText1] = useState("");
+  const [text2, setText2] = useState("");
+  const [fileName1, setFileName1] = useState<string | undefined>();
+  const [fileName2, setFileName2] = useState<string | undefined>();
+
+  const [similarity, setSimilarity] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+
+  const isValidTextFile = (file: File): boolean => {
+  const acceptedTypes = [
+    "application/pdf",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  ];
+
+  const acceptedExtensions = [".pdf", ".doc", ".docx"];
+
+  const typeIsValid = acceptedTypes.includes(file.type);
+  const extensionIsValid = acceptedExtensions.some(ext =>
+    file.name.toLowerCase().endsWith(ext)
+  );
+
+  return typeIsValid || extensionIsValid;
+};
+
+  // Mise à jour des textes depuis TextInput
+  const handleTextChange = (newText1: string, newText2: string) => {
+    setText1(newText1);
+    setText2(newText2);
+  };
+  
+  const buildFormData = (file: File, target: "text1" | "text2"): FormData => {
+  const formData = new FormData();
+  //pt a aduga file-ul
+  formData.append("file", file);
+  //pt a adauga textele
+  formData.append("target", target);
+  return formData;
+}
+const handleFileRemove = (target: "text1" | "text2") => {
+  if (target === "text1") {
+    setFileName1(undefined);
+    setText1(""); // facultatif : vide aussi le champ
+  } else {
+    setFileName2(undefined);
+    setText2(""); // facultatif
+  }
+};
+const handleFileDrop = async (file: File, target: "text1" | "text2") => {
+  if (!isValidTextFile(file)) {
+  setError("Only PDF and Word documents are allowed.");
+  return;
+}
+  const formData = buildFormData(file, target);
+  const response = await fetch("/api/compare-file", {
+    method: "POST",
+    body: formData,
+  }
+);
+if (target === "text1") {
+    setFileName1(file.name);
+  } else {
+    setFileName2(file.name);
+  }
+  const data = await response.json();
+  setSimilarity(data.similarity);
+};
+
+  // Comparaison des textes via l'API
+  const handleCompare = async () => {
+    setLoading(true);
+    setError("");
+    setSimilarity("");
+
+    try {
+      const response = await fetch("/api/compare", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text1, text2 }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de la comparaison");
+      }
+
+      const data = await response.json();
+      setSimilarity(data.similarity);
+    } catch (err: any) {
+      setError(err.message || "Erreur inconnue");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="font-sans grid grid-rows-[8px_2fr_8px] items-center justify-items-center max-h-screen p-8 gap-16 sm:p-8">
+      <main className="flex flex-col gap-[24px] row-start-2 items-center w-full max-w-screen-lg">
+        {/* Champs de texte */}
+        <TextInput
+          text1={text1}
+          text2={text2}
+            fileName1={fileName1}
+            fileName2={fileName2}
+            onTextChange={handleTextChange}
+            onFileDrop={handleFileDrop}
+            onFileRemove={handleFileRemove}
+        />
+
+        {/* Bouton pour lancer la comparaison */}
+        <Button
+          onClick={handleCompare}
+          label={loading ? "Comparaison en cours..." : "Comparer les deux textes"}
+          disabled={loading}
+        />
+
+        {/* Résultat de la comparaison */}
+        <TextSimilarity
+          text1={text1}
+          text2={text2}
+          similarity={similarity}
+          error={error}
+          loading={loading}
+        />
+
+        {/* Navigation vers une autre page */}
+        <Button
+          onClick={() => router.push("/external-comparison")}
+          label="Comparer avec sources externes"
+        />
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
