@@ -24,6 +24,15 @@ coverage/
 htmlcov/
 .cache/
 pip-wheel-metadata/
+backend/requirements.txt
+backend/.env
+backend/.venv/
+backend/data/
+
+
+# lslocal config
+*.local.*
+*.dev.*
 
 # Migrations Django 
 **/migrations/
@@ -48,6 +57,7 @@ frontend/.eslintcache
 frontend/out/
 frontend/dist/
 frontend/build/
+frontend/.env.local
 
 # JS/TS stuff
 **/*.tsbuildinfo
