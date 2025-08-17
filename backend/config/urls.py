@@ -20,7 +20,7 @@ from compare.views import compare_texts
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("compare/", compare_texts)
+    path('api/compare/', compare_texts)
 ]
 
 
