@@ -1,24 +1,19 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
 import Button from "./components/Button";
 import TextInput from "./components/TextInput";
 import TextSimilarity from "./components/TextSimilarity";
 
 export default function Home() {
   const router = useRouter();
-
   const [text1, setText1] = useState("");
   const [text2, setText2] = useState("");
   const [fileName1, setFileName1] = useState<string | undefined>();
   const [fileName2, setFileName2] = useState<string | undefined>();
-
   const [similarity, setSimilarity] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
 
   const isValidTextFile = (file: File): boolean => {
   const acceptedTypes = [
@@ -28,7 +23,6 @@ export default function Home() {
   ];
 
   const acceptedExtensions = [".pdf", ".doc", ".docx"];
-
   const typeIsValid = acceptedTypes.includes(file.type);
   const extensionIsValid = acceptedExtensions.some(ext =>
     file.name.toLowerCase().endsWith(ext)
@@ -36,7 +30,6 @@ export default function Home() {
 
   return typeIsValid || extensionIsValid;
 };
-
   // Mise à jour des textes depuis TextInput
   const handleTextChange = (newText1: string, newText2: string) => {
     setText1(newText1);
@@ -79,24 +72,24 @@ if (target === "text1") {
   const data = await response.json();
   setSimilarity(data.similarity);
 };
-
   // Comparaison des textes via l'API
   const handleCompare = async () => {
     setLoading(true);
     setError("");
     setSimilarity("");
-
     try {
-      const response = await fetch("/api/compare", {
+      const response = await fetch("http://127.0.0.1:8000/api/compare/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text1, text2 }),
-      });
+        body: JSON.stringify({ 
+        paragraph1: text1,
+        paragraph2: text2
 
+}),
+      });
       if (!response.ok) {
         throw new Error("Erreur lors de la comparaison");
       }
-
       const data = await response.json();
       setSimilarity(data.similarity);
     } catch (err: any) {
@@ -105,7 +98,6 @@ if (target === "text1") {
       setLoading(false);
     }
   };
-
   return (
     <div className="font-sans grid grid-rows-[8px_2fr_8px] items-center justify-items-center max-h-screen p-8 gap-16 sm:p-8">
       <main className="flex flex-col gap-[24px] row-start-2 items-center w-full max-w-screen-lg">
@@ -119,14 +111,12 @@ if (target === "text1") {
             onFileDrop={handleFileDrop}
             onFileRemove={handleFileRemove}
         />
-
         {/* Bouton pour lancer la comparaison */}
         <Button
           onClick={handleCompare}
           label={loading ? "Comparaison en cours..." : "Comparer les deux textes"}
           disabled={loading}
         />
-
         {/* Résultat de la comparaison */}
         <TextSimilarity
           text1={text1}
@@ -135,7 +125,6 @@ if (target === "text1") {
           error={error}
           loading={loading}
         />
-
         {/* Navigation vers une autre page */}
         <Button
           onClick={() => router.push("/external-comparison")}
