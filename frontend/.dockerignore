@@ -1,0 +1,25 @@
+# Dossiers à ignorer
+node_modules
+.next
+coverage
+dist
+out
+
+# Fichiers sensibles ou inutiles
+.env
+*.log
+*.lock
+*.DS_Store
+*.swp
+
+# Fichiers de config et scripts locaux
+docker-compose.yml
+Dockerfile
+build.sh
+README.md
+.git
+.gitignore
+.vscode
+
+*.map
+*.md
